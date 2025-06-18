@@ -1,4 +1,4 @@
-# sheet MCP Server
+# Hyperlend MCP Server
 
 An MCP (Model Context Protocol) server that enables AI agents to interact with the hyperlend.
 
