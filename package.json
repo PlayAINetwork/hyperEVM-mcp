@@ -1,6 +1,6 @@
 {
   "name": "hyperlend-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Model Context Protocol server for HyperLend protocol and Kittenswap DEX on Hyperliquid EVM network",
   "main": "index.js",
   "bin": {
