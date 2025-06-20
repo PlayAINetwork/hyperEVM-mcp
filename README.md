@@ -1,10 +1,10 @@
-# HyperLend MCP
+# HyperEVM MCP
 
 A Model Context Protocol server for interacting with HyperLend protocol and Kittenswap DEX on Hyperliquid EVM network. This MCP enables AI agents to perform DeFi operations including lending, borrowing, and token swapping.
 
 ## Features
 
-### HyperLend Protocol
+### HyperEVM Protocol
 - **Supply/Lend**: Deposit assets to earn lending yield and enable borrowing capacity
 - **Withdraw**: Retrieve supplied assets and accrued interest
 - **Borrow**: Borrow assets against supplied collateral with variable or stable rates
@@ -152,7 +152,7 @@ kittenswapSwapTokens --tokenIn HYPE --tokenOut UBTC --amountIn 1.0 --slippageTol
 ## Support
 
 For issues and questions:
-- **GitHub Issues**: [https://github.com/PlayAINetwork/hyperlend-mcp/issues](https://github.com/PlayAINetwork/hyperlend-mcp/issues)
+- **GitHub Issues**: [https://github.com/PlayAINetwork/hyperlend-mcp/issues](https://github.com/PlayAINetwork/hyperEVM-mcp/issues)
 - **Documentation**: Check the inline tool descriptions for detailed parameter information
 
 ## License
