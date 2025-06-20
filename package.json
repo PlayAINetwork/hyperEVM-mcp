@@ -1,10 +1,10 @@
 {
-  "name": "hyperevm-mcp",
+  "name": "hyperevm_mcp",
   "version": "1.0.1",
   "description": "Model Context Protocol server for HyperLend protocol and Kittenswap DEX on Hyperliquid EVM network",
   "main": "index.js",
   "bin": {
-    "hyperevm-mcp": "./index.js"
+    "hyperevm_mcp": "./index.js"
   },
   "keywords": [
     "mcp",

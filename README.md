@@ -42,7 +42,7 @@ npm install -g hyperlend-mcp
   "mcpServers": {
     "hyperlend": {
       "command": "npx",
-      "args": ["hyperevm-mcp"],
+      "args": ["hyperevm_mcp"],
       "env": {
         "PRIVATE_KEY": "your_private_key_here",
         "RPC_URL": "https://rpc.hypurrscan.io" "[optional]"
