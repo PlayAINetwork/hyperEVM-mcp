@@ -520,7 +520,7 @@ server.tool(
 
 // Tool: Supply/Lend assets
 server.tool(
-  "hyperlendSupply",
+  "hyperevmSupply",
   "Supply/lend assets to HyperLend protocol lending pools on Hyperliquid EVM network to earn lending yield and enable borrowing capacity",
   {
     token: z.string().describe("Token symbol (HYPE, UBTC, UETH, USDE, USDT0, SUSDE, WSTHYPE) or contract address"),
@@ -618,7 +618,7 @@ server.tool(
 
 // Tool: Withdraw assets 
 server.tool(
-  "hyperlendWithdraw",
+  "hyperevmWithdraw",
   "Withdraw supplied assets and accrued interest from HyperLend protocol lending pools back to your wallet",
   {
     token: z.string().describe("Token symbol (HYPE, UBTC, UETH, USDE, USDT0, SUSDE, WSTHYPE) or contract address"),
@@ -732,7 +732,7 @@ server.tool(
 
 // Tool: Borrow assets
 server.tool(
-  "hyperlendBorrow",
+  "hyperevmBorrow",
   "Borrow assets against supplied collateral from HyperLend protocol with variable or stable interest rates",
   {
     token: z.string().describe("Token symbol (HYPE, UBTC, UETH, USDE, USDT0, SUSDE, WSTHYPE) or contract address"),
@@ -846,7 +846,7 @@ server.tool(
 
 // Tool: Repay debt
 server.tool(
-  "hyperlendRepay",
+  "hyperevmRepay",
   "Repay borrowed debt to HyperLend protocol to reduce debt burden and improve health factor",
   {
     token: z.string().describe("Token symbol (HYPE, UBTC, UETH, USDE, USDT0, SUSDE, WSTHYPE) or contract address"),
@@ -993,7 +993,7 @@ server.tool(
 
 // Tool: Get comprehensive user data
 server.tool(
-  "hyperlendAccountState",
+  "hyperevmAccountState",
   "Get comprehensive overview of your complete HyperLend position including collateral, debt, and health metrics",
   {
     userAddress: z.string().optional().describe("Address of the user to query (defaults to wallet address)"),
@@ -1125,7 +1125,7 @@ server.tool(
 
 // Tool: Get all reserves/markets
 server.tool(
-  "hyperlendGetReserves",
+  "hyperevmGetReserves",
   "View all available lending markets and their current parameters in HyperLend protoco",
   {
     detailed: z.boolean().default(false).describe("Whether to include detailed information for each reserve")
@@ -1266,7 +1266,7 @@ async function startServer() {
   try {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error("HyperLend MCP server started successfully");
+    console.error("HyperEVM MCP server started successfully");
   } catch (error) {
     console.error(`Failed to start server: ${error.message}`);
     process.exit(1);
