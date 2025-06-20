@@ -1,10 +1,10 @@
 {
-  "name": "hyperlend-mcp",
+  "name": "hyperevm-mcp",
   "version": "1.0.1",
   "description": "Model Context Protocol server for HyperLend protocol and Kittenswap DEX on Hyperliquid EVM network",
   "main": "index.js",
   "bin": {
-    "hyperlend-mcp": "./index.js"
+    "hyperevm-mcp": "./index.js"
   },
   "keywords": [
     "mcp",
@@ -22,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PlayAINetwork/hyperlend-mcp.git"
+    "url": "git+https://github.com/PlayAINetwork/hyperEVM-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/PlayAINetwork/hyperlend-mcp/issues"
+    "url": "https://github.com/PlayAINetwork/hyperEVM-mcp/issues"
   },
-  "homepage": "https://github.com/PlayAINetwork/hyperlend-mcp#readme",
+  "homepage": "https://github.com/PlayAINetwork/hyperEVM-mcp#readme",
   "engines": {
     "node": ">=18.0.0"
   },
