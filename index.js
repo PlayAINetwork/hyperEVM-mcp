@@ -296,6 +296,183 @@ async function approveToken(wallet, tokenAddress, spenderAddress, amount) {
   return null;
 }
 
+server.tool(
+  "getTokenDetails",
+  "Fetch comprehensive token details including price, market data, and trading metrics from DexScreener API",
+  {
+    tokenAddress: z.string().describe("Contract address of the token to fetch details for")
+  },
+  async ({ tokenAddress }) => {
+    try {
+      if (!ethers.isAddress(tokenAddress)) {
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              status: "error",
+              message: "Invalid token address format",
+              providedAddress: tokenAddress
+            }, null, 2)
+          }]
+        };
+      }
+
+      const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`);
+      
+      if (!response.ok) {
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              status: "error",
+              message: `Failed to fetch token data from DexScreener`,
+              httpStatus: response.status,
+              statusText: response.statusText
+            }, null, 2)
+          }]
+        };
+      }
+
+      const data = await response.json();
+      
+      if (!data.pairs || data.pairs.length === 0) {
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              status: "error",
+              message: "No trading pairs found for this token address",
+              tokenAddress: tokenAddress,
+              suggestion: "This token might not be listed on any supported DEXes or the address might be incorrect"
+            }, null, 2)
+          }]
+        };
+      }
+
+      const tokenInfo = {
+        tokenAddress: tokenAddress,
+        totalPairs: data.pairs.length,
+        summary: {
+          name: data.pairs[0].baseToken.name,
+          symbol: data.pairs[0].baseToken.symbol,
+          totalSupply: data.pairs[0].info?.totalSupply || "N/A",
+          circulatingSupply: data.pairs[0].info?.circulatingSupply || "N/A",
+          websites: data.pairs[0].info?.websites || [],
+          socials: data.pairs[0].info?.socials || []
+        },
+        marketData: {
+          primaryPair: data.pairs.reduce((prev, current) => 
+            (parseFloat(current.liquidity?.usd || 0) > parseFloat(prev.liquidity?.usd || 0)) ? current : prev
+          ),
+          allPairs: data.pairs.map(pair => ({
+            dexName: pair.dexId,
+            pairAddress: pair.pairAddress,
+            baseToken: {
+              address: pair.baseToken.address,
+              name: pair.baseToken.name,
+              symbol: pair.baseToken.symbol
+            },
+            quoteToken: {
+              address: pair.quoteToken.address,
+              name: pair.quoteToken.name,
+              symbol: pair.quoteToken.symbol
+            },
+            price: {
+              usd: pair.priceUsd,
+              native: pair.priceNative,
+              change24h: pair.priceChange?.h24 || "0"
+            },
+            volume: {
+              h24: pair.volume?.h24 || "0",
+              h6: pair.volume?.h6 || "0",
+              h1: pair.volume?.h1 || "0"
+            },
+            liquidity: {
+              usd: pair.liquidity?.usd || "0",
+              base: pair.liquidity?.base || "0",
+              quote: pair.liquidity?.quote || "0"
+            },
+            marketCap: pair.marketCap || "N/A",
+            fdv: pair.fdv || "N/A",
+            pairCreatedAt: pair.pairCreatedAt ? new Date(pair.pairCreatedAt).toISOString() : "N/A",
+            chainId: pair.chainId,
+            url: pair.url
+          }))
+        },
+        analytics: {
+          highestLiquidityPair: data.pairs.reduce((prev, current) => 
+            (parseFloat(current.liquidity?.usd || 0) > parseFloat(prev.liquidity?.usd || 0)) ? current : prev
+          ),
+          highestVolumePair: data.pairs.reduce((prev, current) => 
+            (parseFloat(current.volume?.h24 || 0) > parseFloat(prev.volume?.h24 || 0)) ? current : prev
+          ),
+          totalLiquidityUSD: data.pairs.reduce((sum, pair) => 
+            sum + parseFloat(pair.liquidity?.usd || 0), 0
+          ).toFixed(2),
+          totalVolume24hUSD: data.pairs.reduce((sum, pair) => 
+            sum + parseFloat(pair.volume?.h24 || 0), 0
+          ).toFixed(2),
+          averagePrice: data.pairs.length > 0 
+            ? (data.pairs.reduce((sum, pair) => sum + parseFloat(pair.priceUsd || 0), 0) / data.pairs.length).toFixed(8)
+            : "0",
+          priceRange24h: {
+            min: Math.min(...data.pairs.map(p => parseFloat(p.priceUsd || Infinity))).toFixed(8),
+            max: Math.max(...data.pairs.map(p => parseFloat(p.priceUsd || 0))).toFixed(8)
+          }
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      const primaryPair = tokenInfo.analytics.highestLiquidityPair;
+      tokenInfo.insights = {
+        mostLiquidDex: primaryPair.dexId,
+        primaryTradingPair: `${primaryPair.baseToken.symbol}/${primaryPair.quoteToken.symbol}`,
+        priceChange24h: primaryPair.priceChange?.h24 || "0",
+        isNewToken: primaryPair.pairCreatedAt 
+          ? (Date.now() - new Date(primaryPair.pairCreatedAt).getTime()) < (7 * 24 * 60 * 60 * 1000) // 7 days
+          : false,
+        riskFactors: []
+      };
+
+      if (parseFloat(tokenInfo.analytics.totalLiquidityUSD) < 10000) {
+        tokenInfo.insights.riskFactors.push("Low liquidity (< $10,000)");
+      }
+      if (parseFloat(primaryPair.volume?.h24 || 0) < 1000) {
+        tokenInfo.insights.riskFactors.push("Low trading volume (< $1,000/24h)");
+      }
+      if (tokenInfo.insights.isNewToken) {
+        tokenInfo.insights.riskFactors.push("New token (< 7 days old)");
+      }
+      if (data.pairs.length === 1) {
+        tokenInfo.insights.riskFactors.push("Single trading pair");
+      }
+
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({
+            status: "success",
+            data: tokenInfo
+          }, null, 2)
+        }]
+      };
+
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({
+            status: "error",
+            message: `Failed to fetch token details: ${error.message}`,
+            tokenAddress: tokenAddress,
+            details: error.stack
+          }, null, 2)
+        }]
+      };
+    }
+  }
+);
+
 
 server.tool(
   "kittenswapSwapTokens",
